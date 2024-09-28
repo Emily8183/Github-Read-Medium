@@ -3,7 +3,7 @@ const mediumURL ="https://api.rss2json.com/v1/api.json?rss_url=https://medium.co
 
 async function getArticlesByUsername(username) {
   try {
-    const result = await axios.get(mediumURL + emily.zy.lin);
+    const result = await axios.get(mediumURL + username);
     const filteredResult = result.data.items.filter(
       (item) =>
         item.categories.length > 0

@@ -1,9 +1,11 @@
-var express = require("express");
-var app = express();
-var port = process.env.PORT || 3000;
-app.use(express.json());
-app.use(require("./route/api"));
+//only for running locally
 
-app.listen(port, function () {
-  console.log("Server listening " + port);
-});
+// var express = require("express");
+// var app = express();
+// var port = process.env.PORT || 3000;
+// app.use(express.json());
+// app.use(require("./onlyforreference"));
+
+// app.listen(port, function () {
+//   console.log("Server listening " + port);
+// });

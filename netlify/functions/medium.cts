@@ -50,10 +50,6 @@ export default async (request, context) => {
           <text x="30" y="50" font-family="Arial, sans-serif" font-size="20" font-weight="bold" fill="#333">
             ${item.title}
           </text>
-
-          <text x="30" y="90" font-family="Arial, sans-serif" font-size="14" fill="#999">
-            ${item.categories.join(", ")}
-          </text>
           
           <text x="30" y="130" font-family="Arial, sans-serif" font-size="12" fill="#555">
             Published on: ${new Date(item.pubDate).toLocaleDateString()}
@@ -76,9 +72,12 @@ export default async (request, context) => {
     // let res = new Response(JSON.stringify(filteredResult));
 
     // Create the response with the SVG content and appropriate headers
-    let res = new Response(svgContent);
+    const res = new Response(svgContent, {
+      headers: {
+        "Content-Type": "image/svg+xml", // Overwrite Content-Type
+      },
+    });
 
-    res.headers.append("Content-Type", "image/svg+xml"); //add the header
     return res;
   } catch (error) {
     console.error("Error fetching articles:", error);

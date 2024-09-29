@@ -5,20 +5,20 @@ const mediumURL =
 
 export default async (request, context) => {
   try {
-    const apiresponse = await fetch(mediumURL + "emily.zy.lin");
+    const apiresponse = await fetch(mediumURL + "emily.zy.lin"); // to fetch the data from RSS2JSON (which is also from Medium)
 
     // Check if the response is OK (status code 200-299)
     if (!apiresponse.ok) {
       throw new Error(`HTTP error! status: ${apiresponse.status}`);
     }
 
-    const result = await apiresponse.json(); // Convert the response to JSON
+    const result = await apiresponse.json(); // Convert the response I fetched to my clients
     const filteredResult = result.items.filter(
       (item) => item.categories.length > 0
     );
 
     let res = new Response(JSON.stringify(filteredResult));
-    res.headers.append("Content-Type", "image/svg+xml");
+    res.headers.append("Content-Type", "image/svg+xml"); //add the header
     return res;
   } catch (error) {
     console.error("Error fetching articles:", error);

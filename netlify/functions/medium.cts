@@ -14,22 +14,12 @@ export default async (request, context) => {
 
     const a = await test();
     // Return the response in the format Netlify expects
-    return {
-      statusCode: 200,
-      headers: {
-        "Content-Type": "application/json",
-        "Access-Control-Allow-Origin": "*", // CORS header, adjust as necessary
-      },
-      body: JSON.stringify({ message: a }),
-    };
+    return new Response(a);
   } catch (error) {
     console.error("Error fetching articles:", error);
 
     // Error handling, sending error message back to client
-    return {
-      statusCode: 500,
-      body: JSON.stringify({ error: error.message }),
-    };
+    return new Response(error);
   }
 };
 export const config = {
@@ -121,30 +111,30 @@ async function test() {
 // };
 
 // Function to wrap text based on a specified max length
-function simpleWrapText(text, maxLineLength) {
-  const words = text.split(" ");
-  let lines: string[] = [];
-  let currentLine = "";
+// function simpleWrapText(text, maxLineLength) {
+//   const words = text.split(" ");
+//   let lines: string[] = [];
+//   let currentLine = "";
 
-  words.forEach((word) => {
-    if ((currentLine + word).length <= maxLineLength) {
-      currentLine += (currentLine ? " " : "") + word;
-    } else {
-      lines.push(currentLine);
-      currentLine = word; // Start new line
-    }
-  });
+//   words.forEach((word) => {
+//     if ((currentLine + word).length <= maxLineLength) {
+//       currentLine += (currentLine ? " " : "") + word;
+//     } else {
+//       lines.push(currentLine);
+//       currentLine = word; // Start new line
+//     }
+//   });
 
-  if (currentLine) {
-    lines.push(currentLine); // Add the last line
-  }
+//   if (currentLine) {
+//     lines.push(currentLine); // Add the last line
+//   }
 
-  return lines;
-}
+//   return lines;
+// }
 
-export const config = {
-  path: "/medium",
-};
+// export const config = {
+//   path: "/medium",
+// };
 
 // async function parseToMediumCard(request) {
 //   const username = request.query.username;

@@ -12,130 +12,26 @@ export default async (request, context) => {
       throw new Error(`HTTP error! status: ${apiResponse.status}`);
     }
 
-    const result = await apiResponse.json();
-    const filteredResult = result.items.filter(item => item.categories.length > 0);
-
-    const cardsToDisplay = filteredResult.slice(0, 2);
-
-    const width = query.width || 400; 
-    const height = query.height || 280; 
-
-    // Initialize the SVG string
-    let svgContent = `<svg xmlns="http://www.w3.org/2000/svg" 
-                         width="${2 * (width + 40)}" height="${height + 40}" 
-                         version="1.1">
-                       <defs>
-                         <linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="100%">
-                           <stop offset="0%" style="stop-color:#f5f5f5;stop-opacity:1" />
-                           <stop offset="100%" style="stop-color:#ddd;stop-opacity:1" />
-                         </linearGradient>
-                       </defs>`;
-
-    cardsToDisplay.forEach((item, index) => {
-      const titleLines = simpleWrapText(item.title, 30); // Change the number to adjust the max line length
-      svgContent += `
-        <g transform="translate(${index * (width + 40)}, 20)">
-          <rect 
-            width="${width}" 
-            height="${height}" 
-            fill="url(#grad)" 
-            rx="20" 
-            ry="20" 
-            style="filter: drop-shadow(0 6px 18px rgba(0, 0, 0, 0.15));" />
-          
-          ${titleLines.map((line, lineIndex) => `
-            <text x="30" y="${50 + lineIndex * 30}" font-family="Arial, sans-serif" font-size="20" font-weight="bold" fill="#333">
-              ${line}
-            </text>
-          `).join('')}
-
-          <text x="30" y="${90 + titleLines.length * 30}" font-family="Arial, sans-serif" font-size="14" fill="#999">
-            ${item.categories.join(', ')}
-          </text>
-          
-          <text x="30" y="${130 + titleLines.length * 30}" font-family="Arial, sans-serif" font-size="12" fill="#555">
-            Published on: ${new Date(item.pubDate).toLocaleDateString()}
-          </text>
-
-          <rect x="0" y="${height - 50}" width="${width}" height="50" fill="#f0f0f0" />
-          <text x="30" y="${height - 20}" font-family="Arial, sans-serif" font-size="14" font-weight="bold" fill="#0066cc" cursor="pointer">
-            Read More
-          </text>
-        </g>`;
-    });
-
-    svgContent += `</svg>`;
-
-    let res = new Response(svgContent);
-    res.headers.append("Content-Type", "image/svg+xml"); 
-    return res;
-
-  } catch (error) {
-    console.error("Error fetching articles:", error);
-    return new Response(error.message);
-  }
-};
-
-// Function to wrap text based on a specified max length
-function simpleWrapText(text, maxLineLength) {
-  const words = text.split(' ');
-  let lines: string[] = [];
-  let currentLine = '';
-
-  words.forEach(word => {
-    if ((currentLine + word).length <= maxLineLength) {
-      currentLine += (currentLine ? ' ' : '') + word;
-    } else {
-      lines.push(currentLine);
-      currentLine = word; // Start new line
-    }
-  });
-  
-  if (currentLine) {
-    lines.push(currentLine); // Add the last line
-  }
-
-  return lines;
-}
-    // let requestObj = {
-    //   query: {
-    //     width: defaultConfig.card.width,
-    //     height: defaultConfig.card.height,
-    //     offset: 0,
-    //     limit: defaultConfig.default.limit,
-    //     username,
-    //   },
-    // };
-
     const a = await test();
-    return new Response(a);
-
-    // Check if the response is OK (status code 200-299)
-    if (!apiResponse.ok) {
-      throw new Error(`HTTP error! status: ${apiResponse.status}`);
-    }
-
-    const result = await apiResponse.json(); // Convert the response I fetched to my clients
-    const filteredResult = result.items.filter(
-      (item) => item.categories.length > 0
-    );
-
-    // const svgContent = await parseToMediumCard(requestObj); //becuz it's async, add await
-
-    // Create the response with the SVG content and appropriate headers
-    // const res = new Response(svgContent, {
-    //   headers: {
-    //     "Content-Type": "image/svg+xml", // Overwrite Content-Type
-    //   },
-    // });
-
-    // return res;
+    // Return the response in the format Netlify expects
+    return {
+      statusCode: 200,
+      headers: {
+        "Content-Type": "application/json",
+        "Access-Control-Allow-Origin": "*", // CORS header, adjust as necessary
+      },
+      body: JSON.stringify({ message: a }),
+    };
   } catch (error) {
     console.error("Error fetching articles:", error);
-    return new Response(error);
+
+    // Error handling, sending error message back to client
+    return {
+      statusCode: 500,
+      body: JSON.stringify({ error: error.message }),
+    };
   }
 };
-
 export const config = {
   path: "/medium",
 };
@@ -144,6 +40,111 @@ async function test() {
   console.log("1");
   return "1";
 }
+
+//   const result = await apiResponse.json();
+//   const filteredResult = result.items.filter(
+//     (item) => item.categories.length > 0
+//   );
+
+//   const cardsToDisplay = filteredResult.slice(0, 2);
+
+//   const width = query.width || 400;
+//   const height = query.height || 280;
+
+//   // Initialize the SVG string
+//   let svgContent = `<svg xmlns="http://www.w3.org/2000/svg"
+//                        width="${2 * (width + 40)}" height="${height + 40}"
+//                        version="1.1">
+//                      <defs>
+//                        <linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="100%">
+//                          <stop offset="0%" style="stop-color:#f5f5f5;stop-opacity:1" />
+//                          <stop offset="100%" style="stop-color:#ddd;stop-opacity:1" />
+//                        </linearGradient>
+//                      </defs>`;
+
+//   cardsToDisplay.forEach((item, index) => {
+//     const titleLines = simpleWrapText(item.title, 30); // Change the number to adjust the max line length
+//     svgContent += `
+//       <g transform="translate(${index * (width + 40)}, 20)">
+//         <rect
+//           width="${width}"
+//           height="${height}"
+//           fill="url(#grad)"
+//           rx="20"
+//           ry="20"
+//           style="filter: drop-shadow(0 6px 18px rgba(0, 0, 0, 0.15));" />
+
+//         ${titleLines
+//           .map(
+//             (line, lineIndex) => `
+//           <text x="30" y="${
+//             50 + lineIndex * 30
+//           }" font-family="Arial, sans-serif" font-size="20" font-weight="bold" fill="#333">
+//             ${line}
+//           </text>
+//         `
+//           )
+//           .join("")}
+
+//         <text x="30" y="${
+//           90 + titleLines.length * 30
+//         }" font-family="Arial, sans-serif" font-size="14" fill="#999">
+//           ${item.categories.join(", ")}
+//         </text>
+
+//         <text x="30" y="${
+//           130 + titleLines.length * 30
+//         }" font-family="Arial, sans-serif" font-size="12" fill="#555">
+//           Published on: ${new Date(item.pubDate).toLocaleDateString()}
+//         </text>
+
+//         <rect x="0" y="${
+//           height - 50
+//         }" width="${width}" height="50" fill="#f0f0f0" />
+//         <text x="30" y="${
+//           height - 20
+//         }" font-family="Arial, sans-serif" font-size="14" font-weight="bold" fill="#0066cc" cursor="pointer">
+//           Read More
+//         </text>
+//       </g>`;
+//   });
+
+//   svgContent += `</svg>`;
+
+//   let res = new Response(svgContent);
+//   res.headers.append("Content-Type", "image/svg+xml");
+//   return res;
+// } catch (error) {
+//   console.error("Error fetching articles:", error);
+//   return new Response(error.message);
+// }
+// };
+
+// Function to wrap text based on a specified max length
+function simpleWrapText(text, maxLineLength) {
+  const words = text.split(" ");
+  let lines: string[] = [];
+  let currentLine = "";
+
+  words.forEach((word) => {
+    if ((currentLine + word).length <= maxLineLength) {
+      currentLine += (currentLine ? " " : "") + word;
+    } else {
+      lines.push(currentLine);
+      currentLine = word; // Start new line
+    }
+  });
+
+  if (currentLine) {
+    lines.push(currentLine); // Add the last line
+  }
+
+  return lines;
+}
+
+export const config = {
+  path: "/medium",
+};
 
 // async function parseToMediumCard(request) {
 //   const username = request.query.username;

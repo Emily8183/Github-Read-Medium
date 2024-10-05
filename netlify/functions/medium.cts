@@ -26,6 +26,7 @@ export const config = {
   path: "/medium",
 };
 
+//test version
 async function test() {
   console.log("1");
   return "1";
